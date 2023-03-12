@@ -1,0 +1,22 @@
+secure:
+  ignored:
+    urls: #安全路径白名单
+      - /swagger-ui/
+      - /swagger-resources/**
+      - /**/v2/api-docs
+      - /**/*.html
+      - /**/*.js
+      - /**/*.css
+      - /**/*.png
+      - /favicon.ico
+      - /actuator/**
+      - /druid/**
+      - /admin/login
+      - /admin/register
+      - /admin/info
+      - /admin/logout
+
+jwt:
+  key: kanojo #JWT加解密使用的密钥
+  tokenHeader: Authorization #JWT存储的请求头
+  expiration: 120 #JWT的超期限时间(分钟)
