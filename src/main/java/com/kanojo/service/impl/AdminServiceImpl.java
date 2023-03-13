@@ -1,15 +1,17 @@
 package com.kanojo.service.impl;
 
+import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.anno.CreateCache;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.kanojo.config.security.bean.MyJWT;
 import com.kanojo.domain.AdminDetails;
-import com.kanojo.exception.MyException;
-import com.kanojo.module.Admin;
 import com.kanojo.dto.LoginUserParam;
+import com.kanojo.exception.MyException;
+import com.kanojo.mapper.AdminMapper;
+import com.kanojo.module.Admin;
 import com.kanojo.module.Resource;
 import com.kanojo.service.AdminService;
-import com.kanojo.mapper.AdminMapper;
 import com.kanojo.service.ResourceRelationService;
 import com.kanojo.service.ResourceService;
 import com.kanojo.service.RoleRelationService;
@@ -24,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.concurrent.TimeUnit;
 
 
 @Service
@@ -47,6 +49,9 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
 
     @Autowired
     private MyJWT myJWT;
+
+    @CreateCache(name = "resources_", expire = 60, timeUnit = TimeUnit.MINUTES)
+    private Cache<String, List<Resource>> resourceCache;
 
     @Override
     public String login(LoginUserParam param) {
@@ -91,10 +96,17 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
         if (admin.getStatus().equals(0)) {
             throw new MyException("账号已被禁用");
         }
-        List<Resource> resources = getResources(admin.getId());
-        //资源列表为空
-        if (resources.size() == 0) {
-            throw new MyException("用户暂无资源可访问");
+        //先从缓存里面取）
+        List<Resource> resources = resourceCache.get(username);
+        //缓存暂无数据
+        if (resources == null) {
+            resources = getResources(admin.getId());
+            //加入缓存
+            resourceCache.put(username, resources);
+            //资源列表为空
+            if (resources.size() == 0) {
+                throw new MyException("用户暂无资源可访问");
+            }
         }
         return new AdminDetails(admin, resources);
     }
