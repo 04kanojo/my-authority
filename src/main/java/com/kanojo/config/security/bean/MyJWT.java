@@ -2,8 +2,6 @@ package com.kanojo.config.security.bean;
 
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateTime;
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
 import cn.hutool.jwt.JWT;
 import cn.hutool.jwt.JWTPayload;
 import cn.hutool.jwt.JWTUtil;
@@ -32,11 +30,10 @@ public class MyJWT {
     /**
      * 获取解析出来的数据
      */
-    public Object parse(String token) {
+    public Object parse(String token, String name) {
         JWT jwt = JWTUtil.parseToken(token);
         //获取负载
-        JSONObject userDetails = (JSONObject) jwt.getPayload("userDetails");
-        return JSONUtil.toBean(userDetails, AdminDetails.class);
+        return jwt.getPayload(name);
     }
 
     public String createJWT(AdminDetails userDetails) {
@@ -54,8 +51,12 @@ public class MyJWT {
         //生效时间
         payload.put(JWTPayload.NOT_BEFORE, now);
         //载荷
-        payload.put("userDetails", userDetails);
+        payload.put("username", userDetails.getUsername());
         //使用hutool生成token
         return JWTUtil.createToken(payload, jwtSigner);
+    }
+
+    public Boolean v() {
+        return false;
     }
 }

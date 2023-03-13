@@ -22,7 +22,7 @@ public class AdminController {
 
     @PostMapping("/login")
     private Result login(@RequestBody LoginUserParam param) throws MyException {
-        String token = adminService.login(param);
+        String token = adminService.login(param.getUsername(), param.getPassword());
         if (Objects.isNull(token)) {
             return Result.validateFailed("用户名或密码错误");
         }

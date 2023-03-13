@@ -1,9 +1,5 @@
 package com.kanojo;
 
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
-import cn.hutool.jwt.JWT;
-import cn.hutool.jwt.JWTUtil;
 import com.kanojo.config.security.bean.MyJWT;
 import com.kanojo.domain.AdminDetails;
 import com.kanojo.module.Admin;
@@ -78,10 +74,8 @@ class ApplicationTests {
         admin.setId(1L);
         AdminDetails adminDetails = new AdminDetails(admin, null);
         String token = myJWT.createJWT(adminDetails);
-
-        JWT jwt = JWTUtil.parseToken(token);
-        JSONObject userDetails = (JSONObject) jwt.getPayload("userDetails");
-        JSONUtil.toBean(userDetails, AdminDetails.class);
-        System.out.println(userDetails);
+        System.out.println(token);
+//        UserDetails parse = myJWT.parse(token);
+//        System.out.println(parse);
     }
 }

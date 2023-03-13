@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.kanojo.config.security.bean.MyJWT;
 import com.kanojo.domain.AdminDetails;
-import com.kanojo.dto.LoginUserParam;
 import com.kanojo.exception.MyException;
 import com.kanojo.mapper.AdminMapper;
 import com.kanojo.module.Admin;
@@ -18,6 +17,7 @@ import com.kanojo.service.RoleRelationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -53,20 +53,20 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
     @CreateCache(name = "username_resources_", expire = 60, timeUnit = TimeUnit.MINUTES)
     private Cache<String, List<Resource>> resourceCache;
 
-    @CreateCache(name = "id_userDetails", expire = 60, timeUnit = TimeUnit.MINUTES)
-    private Cache<Long, AdminDetails> userCache;
+    @CreateCache(name = "username_userDetails", expire = 60, timeUnit = TimeUnit.MINUTES)
+    private Cache<String, UserDetails> userCache;
 
     @Override
-    public String login(LoginUserParam param) {
-        AdminDetails userDetails = loadUserByUsername(param.getUsername());
-        if (!passwordEncoder.matches(param.getPassword(), userDetails.getPassword())) {
+    public String login(String username, String password) {
+        AdminDetails userDetails = loadUserByUsername(username);
+        if (!passwordEncoder.matches(password, userDetails.getPassword())) {
             throw new MyException("用户名或者密码错误");
         }
         //将登录用户存进上下文对象
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
         //将登录成功的用户存入缓存
-        userCache.put(userDetails.getAdmin().getId(), userDetails);
+        userCache.put(userDetails.getUsername(), userDetails);
         //返回token
         return myJWT.createJWT(userDetails);
     }

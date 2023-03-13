@@ -67,7 +67,7 @@ public class SecurityConfig {
                 .and().csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 // 自定义权限拒绝处理类
                 .and().exceptionHandling().accessDeniedHandler(restfulAccessDeniedHandler).authenticationEntryPoint(restAuthenticationEntryPoint)
-                // 自定义权限拦截器JWT过滤器
+                // 自定义权限拦截器JWT过滤器(将自定义的过滤器放在最前面)
                 .and().addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
 //        //有动态权限配置时添加动态权限校验过滤器
 //        if (dynamicSecurityService != null) {

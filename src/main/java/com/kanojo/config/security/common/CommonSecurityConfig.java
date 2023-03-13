@@ -1,10 +1,6 @@
 package com.kanojo.config.security.common;
 
-import com.kanojo.config.security.bean.IgnoreUrlsConfig;
-import com.kanojo.config.security.bean.MyJWT;
-import com.kanojo.config.security.bean.RestfulAccessDeniedHandler;
-import com.kanojo.config.security.bean.RestfulAuthenticationEntryPoint;
-import com.kanojo.config.security.bean.JwtAuthenticationTokenFilter;
+import com.kanojo.config.security.bean.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -79,5 +75,20 @@ public class CommonSecurityConfig {
 //    @Bean
 //    public DynamicSecurityFilter dynamicSecurityFilter(){
 //        return new DynamicSecurityFilter();
+//    }
+
+    //    @Bean
+//    public DynamicSecurityService dynamicSecurityService() {
+//        return new DynamicSecurityService() {
+//            @Override
+//            public Map<String, ConfigAttribute> loadDataSource() {
+//                Map<String, ConfigAttribute> map = new ConcurrentHashMap<>();
+//                List<UmsResource> resourceList = resourceService.list();
+//                for (UmsResource resource : resourceList) {
+//                    map.put(resource.getUrl(), new org.springframework.security.access.SecurityConfig(resource.getId() + ":" + resource.getName()));
+//                }
+//                return map;
+//            }
+//        };
 //    }
 }

@@ -1,7 +1,6 @@
 package com.kanojo.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.kanojo.dto.LoginUserParam;
 import com.kanojo.module.Admin;
 import com.kanojo.module.Resource;
 
@@ -13,7 +12,7 @@ public interface AdminService extends IService<Admin> {
     /**
      * 登录返回token
      */
-    String login(LoginUserParam param);
+    String login(String username, String password);
 
     /**
      * 获取用户 根据用户名
