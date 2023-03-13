@@ -14,7 +14,7 @@ spring:
     url: jdbc:mysql://localhost:3306/kanojo-authority?useUnicode=true&serverTimezone=Asia/Shanghai&characterEncoding=utf8&autoReconnect=true&useSSL=false&allowMultiQueries=true
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
-    password: gongbo2004520tr
+    password: root
     type: com.alibaba.druid.pool.DruidDataSource
 
   mvc: #防止swagger报错
