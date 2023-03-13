@@ -2,6 +2,7 @@ package com.kanojo.domain;
 
 import com.kanojo.module.Admin;
 import com.kanojo.module.Resource;
+import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -11,6 +12,7 @@ import java.util.List;
 /**
  * SpringSecurity需要的用户详情
  */
+@Data
 public class AdminDetails implements UserDetails {
     private Admin admin;
 

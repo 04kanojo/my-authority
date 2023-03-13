@@ -1,20 +1,15 @@
 package com.kanojo;
 
-import cn.hutool.core.date.DateField;
-import cn.hutool.core.date.DateTime;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import cn.hutool.jwt.JWT;
-import cn.hutool.jwt.JWTPayload;
 import cn.hutool.jwt.JWTUtil;
-import cn.hutool.jwt.signers.JWTSigner;
-import cn.hutool.jwt.signers.JWTSignerUtil;
 import com.kanojo.config.security.bean.MyJWT;
+import com.kanojo.domain.AdminDetails;
+import com.kanojo.module.Admin;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @SpringBootTest
 class ApplicationTests {
@@ -22,10 +17,6 @@ class ApplicationTests {
     @Autowired
     private MyJWT myJWT;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-//    @Test
 //    void contextLoads() {
 //
 //        //根据hs256算法生成签名
@@ -80,4 +71,17 @@ class ApplicationTests {
 //        String gongbo = passwordEncoder.encode("gongbo");
 //        System.out.println(gongbo);
 //    }
+
+    @Test
+    void test() {
+        Admin admin = new Admin();
+        admin.setId(1L);
+        AdminDetails adminDetails = new AdminDetails(admin, null);
+        String token = myJWT.createJWT(adminDetails);
+
+        JWT jwt = JWTUtil.parseToken(token);
+        JSONObject userDetails = (JSONObject) jwt.getPayload("userDetails");
+        JSONUtil.toBean(userDetails, AdminDetails.class);
+        System.out.println(userDetails);
+    }
 }

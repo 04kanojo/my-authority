@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.kanojo.dto.LoginUserParam;
 import com.kanojo.module.Admin;
 import com.kanojo.module.Resource;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.List;
 
@@ -25,9 +24,4 @@ public interface AdminService extends IService<Admin> {
      * 获取资源 根据用户id
      */
     List<Resource> getResources(Long adminId);
-
-    /**
-     * 获取用户细节
-     */
-    UserDetails loadUserByUsername(String userName, String password);
 }

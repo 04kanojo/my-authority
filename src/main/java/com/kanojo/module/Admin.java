@@ -1,20 +1,17 @@
 package com.kanojo.module;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.Size;
-import javax.validation.constraints.NotNull;
-
-import java.io.Serializable;
-
-import java.util.Date;
-
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;
+
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.io.Serializable;
+import java.util.Date;
 
 @Data
 @AllArgsConstructor
@@ -64,4 +61,7 @@ public class Admin implements Serializable {
     @ApiModelProperty("帐号启用状态：0->禁用；1->启用")
     @Range(min = 0, max = 1)
     private Integer status;
+
+    public Admin() {
+    }
 }

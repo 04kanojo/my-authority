@@ -19,4 +19,4 @@ secure:
 jwt:
   key: kanojo #JWT加解密使用的密钥
   tokenHeader: Authorization #JWT存储的请求头
-  expiration: 120 #JWT的超期限时间(分钟)
+  expiration: 60 #JWT的超期限时间(分钟)

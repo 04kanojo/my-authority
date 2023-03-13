@@ -18,19 +18,19 @@ import com.kanojo.service.RoleRelationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 
 @Service
-public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements AdminService {
+public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements AdminService, UserDetailsService {
 
     @Autowired
     private AdminMapper adminMapper;
@@ -50,17 +50,24 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
     @Autowired
     private MyJWT myJWT;
 
-    @CreateCache(name = "resources_", expire = 60, timeUnit = TimeUnit.MINUTES)
+    @CreateCache(name = "username_resources_", expire = 60, timeUnit = TimeUnit.MINUTES)
     private Cache<String, List<Resource>> resourceCache;
+
+    @CreateCache(name = "id_userDetails", expire = 60, timeUnit = TimeUnit.MINUTES)
+    private Cache<Long, AdminDetails> userCache;
 
     @Override
     public String login(LoginUserParam param) {
-        //获取userDetails
-        UserDetails userDetails = loadUserByUsername(param.getUsername(), param.getPassword());
+        AdminDetails userDetails = loadUserByUsername(param.getUsername());
+        if (!passwordEncoder.matches(param.getPassword(), userDetails.getPassword())) {
+            throw new MyException("用户名或者密码错误");
+        }
         //将登录用户存进上下文对象
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        //生成token返回
+        //将登录成功的用户存入缓存
+        userCache.put(userDetails.getAdmin().getId(), userDetails);
+        //返回token
         return myJWT.createJWT(userDetails);
     }
 
@@ -81,32 +88,26 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
         return resourceService.getResources(new ArrayList<>(resourceIdList));
     }
 
+    /**
+     * 自定义验证
+     */
     @Override
-    public UserDetails loadUserByUsername(String username, String password) {
+    public AdminDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Admin admin = getUserByUsername(username);
         //用户没查到
-        if (Objects.isNull(admin)) {
-            throw new MyException("用户名或者密码错误");
-        }
-        //密码错误
-        if (!passwordEncoder.matches(password, admin.getPassword())) {
+        if (admin == null) {
             throw new MyException("用户名或者密码错误");
         }
         //状态禁用
         if (admin.getStatus().equals(0)) {
             throw new MyException("账号已被禁用");
         }
-        //先从缓存里面取）
+        //从缓存里面取
         List<Resource> resources = resourceCache.get(username);
         //缓存暂无数据
         if (resources == null) {
             resources = getResources(admin.getId());
-            //加入缓存
             resourceCache.put(username, resources);
-            //资源列表为空
-            if (resources.size() == 0) {
-                throw new MyException("用户暂无资源可访问");
-            }
         }
         return new AdminDetails(admin, resources);
     }
