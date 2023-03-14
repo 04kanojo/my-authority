@@ -1,4 +1,4 @@
-package com.kanojo.domain;
+package com.kanojo.config.security.bean;
 
 import com.kanojo.module.Admin;
 import com.kanojo.module.Resource;

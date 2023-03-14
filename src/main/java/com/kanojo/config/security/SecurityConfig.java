@@ -1,4 +1,4 @@
-package com.kanojo.config.security.common;
+package com.kanojo.config.security;
 
 import com.kanojo.config.security.bean.IgnoreUrlsConfig;
 import com.kanojo.config.security.bean.JwtAuthenticationTokenFilter;
@@ -12,6 +12,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -47,11 +49,6 @@ public class SecurityConfig {
     @Autowired
     private JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
 
-//    @Autowired(required = false)
-//    private DynamicSecurityService dynamicSecurityService;
-//    @Autowired(required = false)
-//    private DynamicSecurityFilter dynamicSecurityFilter;
-
     @Bean
     SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry registry = httpSecurity.authorizeRequests();
@@ -69,10 +66,14 @@ public class SecurityConfig {
                 .and().exceptionHandling().accessDeniedHandler(restfulAccessDeniedHandler).authenticationEntryPoint(restAuthenticationEntryPoint)
                 // 自定义权限拦截器JWT过滤器(将自定义的过滤器放在最前面)
                 .and().addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
-//        //有动态权限配置时添加动态权限校验过滤器
-//        if (dynamicSecurityService != null) {
-//            registry.and().addFilterBefore(dynamicSecurityFilter, FilterSecurityInterceptor.class);
-//        }
         return httpSecurity.build();
+    }
+
+    /**
+     * 密码加密
+     */
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }

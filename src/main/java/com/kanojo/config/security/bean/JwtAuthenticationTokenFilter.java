@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -21,6 +22,7 @@ import java.util.concurrent.TimeUnit;
  * 自定义JWT登录授权过滤器
  */
 @Slf4j
+@Component
 public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
     @Autowired
     private MyJWT myJWT;
@@ -34,12 +36,12 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
      * 此过滤器将过滤全部请求,仅对jwt进行校验
      */
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
+    public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
         //根据Authorization请求头获取token数据
         String authToken = request.getHeader(this.tokenHeader);
         if (authToken != null) {
             //通过token解析出用户名字
-            String username = myJWT.parse(authToken, "username").toString();
+            String username = (String) myJWT.parse(authToken, "username");
             //如果取出来用户不为空 && redis里面有信息(没过期) &&上下文对象为空
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = userCache.get(username);

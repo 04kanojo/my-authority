@@ -7,14 +7,15 @@ import cn.hutool.jwt.JWTPayload;
 import cn.hutool.jwt.JWTUtil;
 import cn.hutool.jwt.signers.JWTSigner;
 import cn.hutool.jwt.signers.JWTSignerUtil;
-import com.kanojo.domain.AdminDetails;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Component
 @AllArgsConstructor
 @NoArgsConstructor
 public class MyJWT {
@@ -54,9 +55,5 @@ public class MyJWT {
         payload.put("username", userDetails.getUsername());
         //使用hutool生成token
         return JWTUtil.createToken(payload, jwtSigner);
-    }
-
-    public Boolean v() {
-        return false;
     }
 }

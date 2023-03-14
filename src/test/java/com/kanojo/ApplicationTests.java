@@ -1,7 +1,7 @@
 package com.kanojo;
 
+import com.kanojo.config.security.bean.AdminDetails;
 import com.kanojo.config.security.bean.MyJWT;
-import com.kanojo.domain.AdminDetails;
 import com.kanojo.module.Admin;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,7 +75,9 @@ class ApplicationTests {
         AdminDetails adminDetails = new AdminDetails(admin, null);
         String token = myJWT.createJWT(adminDetails);
         System.out.println(token);
-//        UserDetails parse = myJWT.parse(token);
-//        System.out.println(parse);
+        Object username = myJWT.parse(token, "username");
+        System.out.println(username);
+        String name = (String) username;
+        System.out.println(name);
     }
 }
