@@ -1,13 +1,11 @@
 package com.kanojo.config.security;
 
-import com.kanojo.config.security.bean.IgnoreUrlsConfig;
-import com.kanojo.config.security.bean.JwtAuthenticationTokenFilter;
-import com.kanojo.config.security.bean.RestfulAccessDeniedHandler;
-import com.kanojo.config.security.bean.RestfulAuthenticationEntryPoint;
+import com.kanojo.config.security.bean.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.ObjectPostProcessor;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
@@ -15,6 +13,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 
@@ -49,6 +48,18 @@ public class SecurityConfig {
     @Autowired
     private JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
 
+    /**
+     * 动态权限决策管理器
+     */
+    @Autowired
+    private DynamicAccessDecisionManager dynamicAccessDecisionManager;
+
+    /**
+     * 动态权限数据源
+     */
+    @Autowired
+    private DynamicSecurityMetadataSource dynamicSecurityMetadataSource;
+
     @Bean
     SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry registry = httpSecurity.authorizeRequests();
@@ -56,6 +67,7 @@ public class SecurityConfig {
         for (String url : ignoreUrlsConfig.getUrls()) {
             registry.antMatchers(url).permitAll();
         }
+
         //允许跨域请求的OPTIONS请求
         registry.antMatchers(HttpMethod.OPTIONS).permitAll();
         // 任何请求需要身份认证
@@ -66,6 +78,17 @@ public class SecurityConfig {
                 .and().exceptionHandling().accessDeniedHandler(restfulAccessDeniedHandler).authenticationEntryPoint(restAuthenticationEntryPoint)
                 // 自定义权限拦截器JWT过滤器(将自定义的过滤器放在最前面)
                 .and().addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
+
+
+        //实现动态权限
+        registry.withObjectPostProcessor(new ObjectPostProcessor<FilterSecurityInterceptor>() {
+            @Override
+            public <O extends FilterSecurityInterceptor> O postProcess(O o) {
+                o.setSecurityMetadataSource(dynamicSecurityMetadataSource);
+                o.setAccessDecisionManager(dynamicAccessDecisionManager);
+                return o;
+            }
+        });
         return httpSecurity.build();
     }
 

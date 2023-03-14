@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication
-@MapperScan("com.kanojo.mapper")
+@MapperScan("com.kanojo.modules.mapper")
 //开启事务
 @EnableTransactionManagement
 //jetcache

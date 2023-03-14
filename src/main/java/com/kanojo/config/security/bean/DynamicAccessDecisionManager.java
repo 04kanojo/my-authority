@@ -1,14 +1,12 @@
 package com.kanojo.config.security.bean;
 
-import com.kanojo.config.security.bean.IgnoreUrlsConfig;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.kanojo.common.exception.MyException;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.web.FilterInvocation;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
@@ -16,40 +14,36 @@ import java.util.Collection;
 /**
  * 动态权限决策管理器，用于判断用户是否有访问权限
  */
-//@Component
+@Component
 public class DynamicAccessDecisionManager implements AccessDecisionManager {
-
-    @Autowired
-    private IgnoreUrlsConfig ignoreUrlsConfig;
 
     /**
      * @param authentication:   当前登录用户的角色信息
      * @param object:           请求url信息
-     * @param configAttributes: `UrlFilterInvocationSecurityMetadataSource`中的getAttributes方法传来的，表示当前请求需要的角色（可能有多个）
+     * @param configAttributes: 角色id
      */
     @Override
     public void decide(Authentication authentication, Object object,
                        Collection<ConfigAttribute> configAttributes) throws AccessDeniedException, InsufficientAuthenticationException {
-        // 获取url
-        FilterInvocation filterInvocation = (FilterInvocation) object;
-        String requestUrl = filterInvocation.getRequestUrl();
-        //白名单请求直接放行
-        for (String url : ignoreUrlsConfig.getUrls()) {
-            if (requestUrl.equals(url)) {
-                return;
-            }
+        //白名单直接放行 || 不需要权限访问
+        if (configAttributes == null) {
+            return;
         }
-        //遍历此方法需要的url集合
+
+        //遍历动态权限数据源
         for (ConfigAttribute configAttribute : configAttributes) {
-            //接口所需要的资源与访问人所拥有的资源进行url比对
-            String needAuthority = configAttribute.getAttribute();
+            //获取能访问此url的角色id
+            String roleId = configAttribute.getAttribute();
             for (GrantedAuthority grantedAuthority : authentication.getAuthorities()) {
-                if (needAuthority.trim().equals(grantedAuthority.getAuthority())) {
+                //获取登录用户已有的角色Id
+                String loginUserRoleId = grantedAuthority.getAuthority();
+                //如果匹配任意一个,放行
+                if (roleId.equals(loginUserRoleId)) {
                     return;
                 }
             }
         }
-        throw new AccessDeniedException("权限不足,无法访问");
+        throw new MyException("你小子权限不太够呀");
     }
 
     @Override

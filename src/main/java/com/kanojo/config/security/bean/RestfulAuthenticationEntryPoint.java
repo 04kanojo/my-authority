@@ -1,7 +1,7 @@
 package com.kanojo.config.security.bean;
 
 import cn.hutool.json.JSONUtil;
-import com.kanojo.common.Result;
+import com.kanojo.common.result.Result;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;

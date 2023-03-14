@@ -1,8 +1,8 @@
 package com.kanojo;
 
-import com.kanojo.config.security.bean.AdminDetails;
+import cn.hutool.jwt.JWT;
+import cn.hutool.jwt.JWTUtil;
 import com.kanojo.config.security.bean.MyJWT;
-import com.kanojo.module.Admin;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -70,14 +70,19 @@ class ApplicationTests {
 
     @Test
     void test() {
-        Admin admin = new Admin();
-        admin.setId(1L);
-        AdminDetails adminDetails = new AdminDetails(admin, null);
-        String token = myJWT.createJWT(adminDetails);
-        System.out.println(token);
-        Object username = myJWT.parse(token, "username");
+//        Admin admin = new Admin();
+//        admin.setId(1L);
+//        AdminDetails adminDetails = new AdminDetails(admin, null);
+//        String token = myJWT.createJWT(adminDetails);
+//        System.out.println(token);
+
+        JWT jwt = JWTUtil.parseToken("1");
+        System.out.println(jwt);
+        Object username = jwt.getPayload("username");
         System.out.println(username);
-        String name = (String) username;
-        System.out.println(name);
+//        Object username = myJWT.parse(token, "username");
+//        System.out.println(username);
+//        String name = (String) username;
+//        System.out.println(name);
     }
 }

@@ -33,6 +33,7 @@ public class MyJWT {
      */
     public Object parse(String token, String name) {
         JWT jwt = JWTUtil.parseToken(token);
+        System.out.println(jwt);
         //获取负载
         return jwt.getPayload(name);
     }

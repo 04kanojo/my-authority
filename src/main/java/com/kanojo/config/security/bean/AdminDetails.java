@@ -1,36 +1,39 @@
 package com.kanojo.config.security.bean;
 
-import com.kanojo.module.Admin;
-import com.kanojo.module.Resource;
+import com.kanojo.modules.model.Admin;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * SpringSecurity需要的用户详情
  */
 @Data
-public class AdminDetails implements UserDetails {
+@AllArgsConstructor
+@NoArgsConstructor
+public class AdminDetails implements UserDetails, Serializable {
     private Admin admin;
 
     /**
-     * 资源集合
+     * 角色id集合
      */
-    private List<Resource> resourceList;
-
-    public AdminDetails(Admin Admin, List<Resource> resourceList) {
-        this.admin = Admin;
-        this.resourceList = resourceList;
-    }
+    private List<Long> roleIds;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        //返回当前用户的角色
-//        return resourceList.stream().map(resource -> new SimpleGrantedAuthority(resource.getId(), resource.getName())).collect(Collectors.toList());
-        return null;
+        //返回当前用户的角色id数组
+        return roleIds
+                .stream()
+                .map(roleId -> new SimpleGrantedAuthority(roleId.toString()))
+                .collect(Collectors.toList());
     }
 
     @Override

@@ -29,7 +29,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
     @Value("${jwt.tokenHeader}")
     private String tokenHeader;
 
-    @CreateCache(name = "username_userDetails", expire = 60, timeUnit = TimeUnit.MINUTES)
+    @CreateCache(name = "username_userDetails_", expire = 60, timeUnit = TimeUnit.MINUTES)
     private Cache<String, UserDetails> userCache;
 
     /**
@@ -41,7 +41,13 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
         String authToken = request.getHeader(this.tokenHeader);
         if (authToken != null) {
             //通过token解析出用户名字
-            String username = (String) myJWT.parse(authToken, "username");
+            String username;
+            try {
+                username = (String) myJWT.parse(authToken, "username");
+            } catch (Exception e) {
+                log.error("token解析失败");
+                username = null;
+            }
             //如果取出来用户不为空 && redis里面有信息(没过期) &&上下文对象为空
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = userCache.get(username);
