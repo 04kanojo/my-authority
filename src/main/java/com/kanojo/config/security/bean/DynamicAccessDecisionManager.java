@@ -1,6 +1,5 @@
 package com.kanojo.config.security.bean;
 
-import com.kanojo.common.exception.MyException;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.ConfigAttribute;
@@ -43,7 +42,7 @@ public class DynamicAccessDecisionManager implements AccessDecisionManager {
                 }
             }
         }
-        throw new MyException("你小子权限不太够呀");
+        throw new AccessDeniedException("你小子权限不太够呀");
     }
 
     @Override

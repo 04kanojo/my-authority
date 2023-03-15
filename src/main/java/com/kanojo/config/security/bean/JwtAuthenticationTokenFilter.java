@@ -40,13 +40,13 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
         //根据Authorization请求头获取token数据
         String authToken = request.getHeader(this.tokenHeader);
         if (authToken != null) {
-            //通过token解析出用户名字
-            String username;
+            String username = null;
+            //此处全局异常不起效(向上排除异常必须要从controller层抛出,这里是过滤器,抛不到controller,只能使用try catch)
             try {
+                //通过token解析出用户名字
                 username = (String) myJWT.parse(authToken, "username");
             } catch (Exception e) {
                 log.error("token解析失败");
-                username = null;
             }
             //如果取出来用户不为空 && redis里面有信息(没过期) &&上下文对象为空
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
