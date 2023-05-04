@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.kanojo.common.exception.MyException;
 import com.kanojo.config.security.bean.AdminDetails;
-import com.kanojo.config.security.bean.MyJWT;
+import com.kanojo.config.security.bean.JwtTool;
 import com.kanojo.modules.mapper.AdminMapper;
 import com.kanojo.modules.model.Admin;
 import com.kanojo.modules.model.RoleRelation;
@@ -39,7 +39,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private MyJWT myJWT;
+    private JwtTool jwtTool;
 
     @CreateCache(name = "username_userDetails_", expire = 60, timeUnit = TimeUnit.MINUTES)
     private Cache<String, UserDetails> userCache;
@@ -56,7 +56,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
         //将登录成功的用户存入缓存
         userCache.put(userDetails.getUsername(), userDetails);
         //返回token
-        return myJWT.createJWT(userDetails);
+        return jwtTool.createToken(AdminDetails.class, userDetails);
     }
 
     @Override

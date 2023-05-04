@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
     @Autowired
-    private MyJWT myJWT;
+    private JwtTool jwtTool;
     @Value("${jwt.tokenHeader}")
     private String tokenHeader;
 
@@ -44,7 +44,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             //此处全局异常不起效(向上排除异常必须要从controller层抛出,这里是过滤器,抛不到controller,只能使用try catch)
             try {
                 //通过token解析出用户名字
-                username = (String) myJWT.parse(authToken, "username");
+                username = jwtTool.getClaim(authToken, "username");
             } catch (Exception e) {
                 log.error("token解析失败");
             }

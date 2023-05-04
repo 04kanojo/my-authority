@@ -2,7 +2,7 @@ package com.kanojo;
 
 import cn.hutool.jwt.JWT;
 import cn.hutool.jwt.JWTUtil;
-import com.kanojo.config.security.bean.MyJWT;
+import com.kanojo.config.security.bean.JwtTool;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,7 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 class ApplicationTests {
 
     @Autowired
-    private MyJWT myJWT;
+    private JwtTool jwtTool;
 
 //    void contextLoads() {
 //
